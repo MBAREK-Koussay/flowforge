@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>FlowForge — Cahier des Charges</title>
+<style>
+@page { size: A4 portrait; margin: 18mm 16mm 18mm 16mm; }
+* { box-sizing: border-box; }
+body { font-family: "DejaVu Sans", sans-serif; color:#1f2937; font-size: 10.5px; line-height:1.55; }
+h1,h2,h3,h4 { font-weight:700; color:#0b3b5c; margin:0; }
+h1 { font-size: 24px; }
+h2 { font-size: 16px; border-bottom:2px solid #0b97c4; padding-bottom:4px; margin:22px 0 10px; }
+h3 { font-size: 13px; margin:14px 0 6px; color:#0f6b8a; }
+h4 { font-size: 11px; margin:10px 0 4px; }
+p { margin:5px 0; }
+ul,ol { margin:4px 0 8px 18px; padding:0; }
+li { margin:2px 0; }
+table { width:100%; border-collapse:collapse; margin:8px 0; font-size:9.5px; }
+th,td { border:1px solid #c9d4da; padding:5px 7px; text-align:left; vertical-align:top; }
+th { background:#eef5f9; color:#0b3b5c; }
+code { font-family:"DejaVu Sans Mono", monospace; background:#f2f4f5; padding:1px 4px; border-radius:3px; font-size:9.5px; }
+.cover { text-align:center; padding-top:120px; }
+.cover h1 { font-size:34px; }
+.cover .sub { color:#0f6b8a; font-size:15px; margin-top:8px; }
+.cover .meta { margin-top:60px; font-size:11px; color:#4a5560; }
+.badge { display:inline-block; background:#0b82c4; color:#fff; padding:2px 8px; border-radius:10px; font-size:9px; margin-right:4px; }
+.badge.g { background:#1f9d55; }
+.toc li a { color:#0b3b5c; text-decoration:none; }
+.pagebreak { page-break-before: always; }
+.nota { background:#f0f7fa; border-left:3px solid #0b82c4; padding:7px 10px; margin:8px 0; }
+</style>
+</head>
+<body>
+
+<!-- ============ COUVERTURE ============ -->
+<div class="cover">
+  <div class="badge">DOCUMENT TECHNIQUE</div>
+  <div class="badge" style="background:#e6b23c;">v1.0</div>
+  <h1 style="margin-top:30px;">FLOWFORGE</h1>
+  <div class="sub">Plateforme d'Automatisation ERP<br>avec Moteur de Workflow Visuel</div>
+  <div class="meta">
+    <p><strong>Cahier des Charges — Spécification Fonctionnelle &amp; Technique</strong></p>
+    <p>Date : Août 2026</p>
+    <p>Statut : Approuvé — Phase de développement (Phase 1/8 réalisée)</p>
+  </div>
+</div>
+
+<!-- ============ SOMMAIRE ============ -->
+<div class="pagebreak"></div>
+<h2>Sommaire</h2>
+<ol class="two">
+  <li>Contexte &amp; Objectifs</li>
+  <li>Périmètre du Produit</li>
+  <li>Exigences Fonctionnelles</li>
+  <li>Architecture Technique</li>
+  <li>Modèle de Données</li>
+  <li>Rôles, Permissions &amp; Sécurité</li>
+  <li>Moteur d'Exécution de Workflow</li>
+  <li>API REST</li>
+  <li>Plan de Développement</li>
+  <li>Qualité &amp; Tests</li>
+  <li>Environnement d'Exécution</li>
+</ol>
+
+<!-- ============ 1. CONTEXTE ============ -->
+<div class="pagebreak"></div>
+<h2>1. Contexte &amp; Objectifs</h2>
+<p>
+FlowForge est une plateforme SaaS de type <strong>ERP (Enterprise Resource Planning)</strong> orientée
+<strong>automatisation de processus métier</strong>. La solution permet aux entreprises de gérer leurs données
+opérationnelles (clients, produits, stocks, achats, factures) puis de <strong>modéliser, exécuter et surveiller</strong>
+des processus métier automatisés à travers un <strong>constructeur de workflow visuel</strong>.
+</p>
+<h3>1.1 Problématique</h3>
+<p>Les processus métier répétitifs (approbation d'une demande d'achat, relance de facture, alerte de stock) sont souvent
+gérés manuellement (e-mails, tableurs), ce qui engendre : lenteurs, pertes de traçabilité, erreurs humaines et absence de contrôle.
+</p>
+<h3>1.2 Objectifs</h3>
+<ul>
+  <li>Centraliser la gestion des données ERP au sein d'une application unique.</li>
+  <li>Permettre la création <b>visuelle</b> de processus par des utilisateurs non-techniques (drag &amp; drop).</li>
+  <li>Exécuter automatiquement les processus déclenchés par des événements métier.</li>
+  <li>Traçabilité complète : historique d'exécution, audits, statuts en temps réel.</li>
+  <li>Assister la conception de workflow grâce à un <b>générateur IA</b>.</li>
+</ul>
+<h3>1.3 Public cible</h3>
+<p>Responsables opérationnels, gestionnaires, équipes financières et employés souhaitant automatiser des tâches
+quotidiennes sans écrire de code.</p>
+
+<!-- ============ 2. PERIMETRE ============ -->
+<h2>2. Périmètre du Produit</h2>
+<p>Le système se compose de <b>huit modules</b> cohérents :</p>
+<table>
+  <thead><tr><th>N°</th><th>Module</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Simulation Mini-ERP</td><td>Gestion des utilisateurs/roles, clients, produits &amp; inventaire, demandes d'achat, factures.</td></tr>
+    <tr><td>2</td><td>Gestion des Workflows</td><td>Création, édition, activation et versionnement de processus.</td></tr>
+    <tr><td>3</td><td>Constructeur Visuel</td><td>Interface React Flow : nœuds, connexions, configuration, sauvegarde/chargement.</td></tr>
+    <tr><td>4</td><td>Moteur d'Exécution</td><td>Runner, exécuteur de nœuds, évaluateur de conditions, actions, files d'attente.</td></tr>
+    <tr><td>5</td><td>Approbations &amp; Notifications</td><td>Validation/refus, commentaires, e-mail et notifications internes.</td></tr>
+    <tr><td>6</td><td>Tableau de Bord</td><td>KPIs, graphiques de performance et latences.</td></tr>
+    <tr><td>7</td><td>Fonctionnalités avancées</td><td>Modèles, versionnement, journaux d'audit, suivi temps réel (Reverb).</td></tr>
+    <tr><td>8</td><td>IA</td><td>Générateur de workflow à partir d'un texte libre.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ 3. EXIGENCES FONCTIONNELLES ============ -->
+<h2>3. Exigences Fonctionnelles</h2>
+
+<h3>3.1 Module 1 — Simulation Mini-ERP</h3>
+<h4>Gestion des utilisateurs</h4>
+<ul>
+  <li>Authentification (enregistrement, connexion, déconnexion), tokens Sanctum.</li>
+  <li>Quatre rôles : <b>Admin</b>, <b>Manager</b>, <b>Finance</b>, <b>Employee</b>.</li>
+  <li>Assignation de roles et permissions (RBAC).</li>
+</ul>
+<h4>Clients</h4>
+<p>CRUD (création, lecture, recherche, filtrage, mise à jour, suppression), statut actif/inactif.</p>
+<h4>Produits &amp; Stock</h4>
+<ul>
+  <li>CRUD produits (nom, SKU unique, prix, quantité, seuil minimum).</li>
+  <li>Mouvements de stock avec historique et référence morph.</li>
+  <li>Détection automatique des <b>stocks faibles</b>.</li>
+</ul>
+<h4>Demandes d'achat</h4>
+<p>Créées par un employé ; statuts <i>pending / approved / rejected</i> ; montant, description.</p>
+<h4>Factures</h4>
+<p>Montant, échéance, statut <i>pending / paid / overdue</i> ; marquage payé ; détection auto des retards (scheduler).</p>
+<p class="notice"><b>Données de démonstration :</b> 50 clients, 100 produits, 20 employés, 100 factures, 50 demandes d'achat générées par factory/seeder (données présentes après installation).</p>
+
+<h3>3.2 Module 2 — Gestion des Workflows</h3>
+<p>Un workflow associe des entités : nœuds (positionnés) et connexions. Entités versionnées et dotées de statut
+(<i>draft / active / paused / archived</i>).</p>
+
+<h3>3.3 Module 3 — Constructeur Visuel</h3>
+<p>Interface <b>React Flow</b> : glisser-déposer de nœuds, création de connexions, suppression, configuration via panneau
+latéral, sauvegarde et chargement. Types de nœuds :</p>
+<ul>
+  <li><b>Déclencheur (trigger)</b> : facture créée, demande d'achat créée, stock mis à jour.</li>
+  <li><b>Action</b> : envoyer un e-mail, notification, mettre à jour une entité, générer PDF.</li>
+  <li><b>Condition</b> : ex. <code>si invoice.amount &gt; 5000</code>.</li>
+  <li><b>Approbation</b> : approbation manager / finance.</li>
+  <li><b>Délai</b> : attendre X jours.</li>
+  <li><b>Webhook</b> : appel HTTP externe.</li>
+</ul>
+
+<h3>3.4 Module 4 — Moteur d'Exécution</h3>
+<p>Démarrage automatique sur événement métier, exécution séquentielle des nœuds, évaluation des conditions,
+gestion des erreurs et sauvegarde de l'historique. Composants : <code>WorkflowRunner</code>,
+<code>NodeExecutor</code>, <code>ConditionEvaluator</code>, <code>ActionExecutor</code>. Appui aux jobs &amp; files d'attente.</p>
+
+<h3>3.5 Module 5 — Approbations &amp; Notifications</h3>
+<p>Demande d'approbation : <i>approuver / rejeter / commenter</i> ; historique ; notifications e-mail et internes.</p>
+
+<h3>3.6 Module 6 — Tableau de Bord</h3>
+<p>KPIs : workflows totaux/cours/complétés/échoués, temps moyen d'exécution, approbations en attente.
+Graphiques : performance, workflows les plus utilisés, latences processus.</p>
+
+<h3>3.7 Module 7 — Avancé</h3>
+<p>Modèles (approbation d'achat, relance invite, alerte stock, onboarding), versionnage des workflows,
+journaux d'audit (qui/quoi/quand), suivi temps réel des nœuds (running / completed / failed) via Reverb.</p>
+
+<h3>3.8 Module 8 — IA</h3>
+<p>Générateur de workflow : <i>"crée un workflow qui approuve les factures au-dessus de 10 000 TND"</i> → génération
+JSON (déclencheur + condition + approbation) importable dans le constructeur.</p>
+
+<!-- ============ 4. ARCHITECTURE ============ -->
+<div class="pagebreak"></div>
+<h2>4. Architecture Technique</h2>
+<h3>4.1 Vue d'ensemble des couches</h3>
+<table>
+  <thead><tr><th>Couche</th><th>Rôle</th><th>Technologies</th></tr></thead>
+  <tbody>
+    <tr><td>Présentation</td><td>Interface SPA, constructeur visuel, dashboard</td><td>React · TypeScript · Vite · Tailwind · shadcn/ui · React Flow</td></tr>
+    <tr><td>API</td><td>Contrats JSON / REST, validation, ressources</td><td>Laravel Sanctum · FormRequests · API Resources</td></tr>
+    <tr><td>Application</td><td>Cas d'usage, services, orchestration</td><td>Services Layer · Actions</td></tr>
+    <tr><td>Domaine</td><td>Modèles métier = agrégats, événements de domaine</td><td>Eloquent (DDD concepts)</td></tr>
+    <tr><td>Infrastructure</td><td>Persistance, files, événements, notifications</td><td>Repositories · Jobs · Events · Notifications</td></tr>
+  </tbody>
+</table>
+
+<h3>4.2 Styles d'architecture</h3>
+<ul>
+  <li><b>Monolithe modulaire</b> : le code est groupé par domaine (<code>Domain/Customer</code>, <code>Domain/Workflow</code>…), favorisant la maintenance et un découpage ultérieur en microservices.</li>
+  <li><b>Principes SOLID</b> : responsabilité unique (services), inversion de dépendance (IPorts via interfaces de repository).</li>
+  <li><b>Couplage faible ERP ↔ Moteur</b> : les événements métier (ex. <code>PurchaseRequestCreated</code>) déclenchent des <i>listeners</i> qui résolut les workflows actifs puis jettent un <i>job</i>.</li>
+  <li><b>Exécution déterministe &amp; reparable</b> : chaque nœud écrit une ligne <code>workflow_logs</code>, permettant de reprendre un run échoué.</li>
+  <li><b>Enumérations</b> pour les statuts (pas de chaînes magiques).</li>
+</ul>
+
+<h3>4.3 Structure des dossiers</h3>
+<pre>
+workflow/
+  app/
+    Console/Commands/Demo/          # demo:reset
+    Domain/User/                     # utilisateurs, rôles, permissions, AuthService, RbacService
+    Domain/{Customer,Product,Invoice,PurchaseRequest,Approval,Workflow,Audit}/
+    Http/Controllers/Api/V1/         # contrôleurs API v1
+    Http/Requests/                   # FormRequests
+    Http/Resources/                  # API Resources
+    Http/Middleware/                 # role / permission
+    Support/                         # ApiResponse
+  database/{migrations,factories,seeders}
+  routes/{api,channels,web}
+  tests/{Feature,Unit}
+  frontend/                          # future: React app
+</pre>
+
+<!-- ============ 5. DONNEES ============ -->
+<h2>5. Conception de la Base de Données (MySQL)</h2>
+<h3>5.1 Authentification &amp; RBAC</h3>
+<table>
+  <thead><tr><th>Table</th><th>Colonnes clés</th></tr></thead>
+  <tbody>
+    <tr><td>users</td><td>id, name, email(unique), department, job_title, password, remember_token</td></tr>
+    <tr><td>roles</td><td>id, name, slug(unique), description</td></tr>
+    <tr><td>permissions</td><td>id, name, slug(unique), group</td></tr>
+    <tr><td>permission_role</td><td>role_id, permission_id (PF unique)</td></tr>
+    <tr><td>role_user</td><td>role_id, user_id (PF unique)</td></tr>
+    <tr><td>personal_access_tokens</td><td>Sanctum</td></tr>
+  </tbody>
+</table>
+
+<h3>5.2 Simulation ERP</h3>
+<table>
+  <thead><tr><th>Table</th><th>Colonnes clés</th></tr></thead>
+  <tbody>
+    <tr><td>customers</td><td>company_name, contact_name, email, phone, status(enumeré)</td></tr>
+    <tr><td>products</td><td>name, sku(unique), price, stock_quantity, minimum_stock</td></tr>
+    <tr><td>stock_movements</td><td>product_id(FK), type, quantity, reference_type/reference_id (flou)</td></tr>
+    <tr><td>purchase_requests</td><td>employee_id(FK), amount, description, status(enumeré), approved_at</td></tr>
+    <tr><td>invoices</td><td>customer_id(FK), amount, due_date, status(enumer), paid_at</td></tr>
+  </tbody>
+</table>
+
+<h3>5.3 Workflow Engine</h3>
+<table>
+  <thead><tr><th>Table</th><th>Colonnes clés</th></tr></thead>
+  <tbody>
+    <tr><td>workflows</td><td>name, description, status(enumer), version, created_by(FK), source_workflow_id(FK null)</td></tr>
+    <tr><td>workflow_nodes</td><td>workflow_id(FK), type(enumer), configuration(JSON), position_x, position_y</td></tr>
+    <tr><td>workflow_connections</td><td>workflow_id(FK), source_node, target_node, condition(JSON)</td></tr>
+    <tr><td>workflow_runs</td><td>workflow_id(FK), status(enumer), trigger_data(JSON), started_at, finished_at</td></tr>
+    <tr><td>workflow_logs</td><td>workflow_run_id(FK), node_id, status, message, metadata(JSON)</td></tr>
+    <tr><td>approvals</td><td>workflow_run_id(FK), node_id, approver_id(FK), status, comment, decided_at</td></tr>
+    <tr><td>approva_history</td><td>approval_id(FK), actor_id(FK), action, comment</td></tr>
+    <tr><td>audit_logs</td><td>actor_id(FK), action, entity_type, entity_id, before(JSON), after(JSON)</td></tr>
+    <tr><td>workflow_templates</td><td>name, description, definition(JSON), category</td></tr>
+  </tbody>
+</table>
+
+<div class="nota"><b>Note :</b> index sur toutes les clés étrangères ; colonnes de statut modélisées en <code>ENUM</code> ; JSON pour les configurations de nœuds.</div>
+
+<!-- ============ 6. RBAC ============ -->
+<h2>6. Rôles, Permissions &amp; Sécurité</h2>
+<h3>6.1 Matrice des rôles</h3>
+<table>
+  <thead><tr><th>Rôle</th><th>Permissions principales</th></tr></thead>
+  <tbody>
+    <tr><td>Admin</td><td>Totalité de la matrice (users, customers, products, invoices, purchase_requests, workflows, approvals, dashboard, audit, AI)</td></tr>
+    <tr><td>Manager</td><td>View/create/update clients &amp; produits, gère stock, approuve demandes d'achat &amp; factures, gère workflows, approbations, dashboard, audit, AI</td></tr>
+    <tr><td>Finance</td><td>Vue clients &amp; produits, approuve demandes d'achat, gère factures (mark_paid, approve), workflow exec, approbations, dashboard</td></tr>
+    <tr><td>Employee</td><td>Dashboard, vue produits, crée/lie demandes d'achat, vue factures, vue approbations</td></tr>
+  </tbody>
+</table>
+<h3>6.2 Sécurité</h3>
+<ul>
+  <li>Authentification par token <b>Sanctum</b> (Bearer).</li>
+  <li>Mots de passe hachés (BCrypt 12 rounds).</li>
+  <li>Middlewares <code>role:*</code> et <code>permission:*</code> sur les routes API.</li>
+  <li>Validation systématique via FormRequests ; réponse d'erreur JSON normalisée.</li>
+</ul>
+
+<!-- ============ 7. MOTEUR ============ -->
+<h2>7. Moteur d'Exécution de Workflow</h2>
+<h3>7.1 Cycle de vie d'un workflow</h3>
+<p>Pour l'exemple cible "Approbation d'achat" :</p>
+<pre>
+Demande d'achat créée  ↓ [Événement PurchaseRequestCreated]
+   → File d'attente (job RunWorkflow)
+   → WorkflowRunner : récupère le graphe, initialise un run
+       → NodeExecutor : exécute Déclencheur
+       → ConditionEvaluator : amount &gt; 5000 ?
+           ✓ → Approbation Manager
+                ✓ → Approbation Finance
+                     ✓ → Notification (e-mail)
+                          ✓ → Action: mettre à jour le statut
+       → Logs de route + run finish
+</pre>
+<h3>7.2 Composants clés</h3>
+<ul>
+  <li><code>WorkflowRunner</code> : orchestration d'un run.</li>
+  <li><code>NodeExecutor</code> : dispatch par type de nœud.</li>
+  <li><code>ConditionEvaluator</code> : évalue les conditions (opérateurs, types).</li>
+  <li><code>ActionExecutor</code> : exécute les actions (mail, notification, update record, webhook, délai).</li>
+  <li><b>Approbation</b> : affirmation d'un run (<code>awaiting_approval</code>), reprise après décision.</li>
+</ul>
+
+<!-- ============ 8. API ============ -->
+<h2>8. API REST</h2>
+<p>Toutes les routes sous <code>/api/v1</code>, protégées par token. Enveloppe standardisée :
+<code>{ success, message, data, meta?, timestamps }</code>.</p>
+<table>
+  <thead><tr><th>Méthode</th><th>Route</th><th>Protection</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>POST</td><td>/auth/register</td><td>—</td><td>Inscription (rôle Employee)</td></tr>
+    <tr><td>POST</td><td>/auth/login</td><td>—</td><td>Connexion → token + user</td></tr>
+    <tr><td>POST</td><td>/auth/logout</td><td>auth:sanctum</td><td>Révocation du token</td></tr>
+    <tr><td>GET</td><td>/auth/me</td><td>auth:sanctum</td><td>Utilisateur courant</td></tr>
+    <tr><td>GET</td><td>/users</td><td>permission:users.view</td><td>Liste paginée + recherche</td></tr>
+    <tr><td>PUT</td><td>/users/{user}/roles</td><td>permission:users.update</td><td>Assigner des rôles</td></tr>
+  </tbody>
+</table>
+<p><b>Validation / erreurs :</b> 401 (non authentifié), 403 (permissions insuffisantes), 422 (règles applicables), enveloppe <code>errors</code>.</p>
+
+<!-- ============ 9. ROADMAP / PLAN ============ -->
+<div class="pagebreak"></div>
+<h2>9. Plan de Développement (Roadmap)</h2>
+<table>
+  <thead><tr><th>Phase</th><th>Livrable</th><th>Statut</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>Analyse &amp; Conception (architecture, données, planning)</td><td>✓ Terminée</td></tr>
+    <tr><td>1</td><td>Backend Laravel : Sanctum, RBAC, API base</td><td>✓ Réalisée</td></tr>
+    <tr><td>2</td><td>Modules ERP (clients, produits/stock, demandes d'achat, factures) + démo</td><td>À faire</td></tr>
+    <tr><td>3</td><td>CRUD Workflow (nœuds, connexions, templates, versionnage, audit)</td><td>À faire</td></tr>
+    <tr><td>4</td><td>Constructeur React Flow (frontend)</td><td>À faire</td></tr>
+    <tr><td>5</td><td>Moteur d'exécution (Runner, Condition, Action) + événements/jobs</td><td>À faire</td></tr>
+    <tr><td>6</td><td>Approbations &amp; notifications</td><td>À faire</td></tr>
+    <tr><td>7</td><td>Dashboard + heure temps réel (Reverb)</td><td>À faire</td></tr>
+    <tr><td>8</td><td>IA : générateur de workflow</td><td>À faire</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ 10. QUALITE ============ -->
+<h2>10. Qualité &amp; Tests</h2>
+<ul>
+  <li>Tests fonctionnels <b>Pest/PHPUnit</b> sur auth &amp; RBAC (12 tests verts à ce stade).</li>
+  <li>Tests sur base temporaires SQLite in-memory (ne touchent pas les données réelles).</li>
+  <li>Suivi des fichiers : <code>php artisan test</code>, <code>demo:reset --fresh</code>.</li>
+  <li>Journalisation (Log) pour traçabilité des erreurs.</li>
+</ul>
+
+<!-- ============ 11. ENVIRONNEMENT ============ -->
+<h2>11. Environnement d'Exécution</h2>
+<table>
+  <thead><tr><th>Composant</th><th>Version / Configuration</th></tr></thead>
+  <tbody>
+    <tr><td>PHP</td><td>8.4 (herd-lite / XAMPP)</td></tr>
+    <tr><td>Laravel</td><td>12.x</td></tr>
+    <tr><td>Base de données</td><td>MySQL 8 (base <code>flowforge</code>)</td></tr>
+    <tr><td>File d'attente</td><td><code>database</code> en dev (Redirigeable vers Redis en production)</td></tr>
+    <tr><td>Serveur dev</td><td><code>php artisan serve --no-reload</code></td></tr>
+    <tr><td>Comptes démo</td><td>admin@flowforge.dev · manager@flowforge.dev · finance@flowforge.dev · employee@flowforge.dev / mdp <code>password</code></td></tr>
+  </tbody>
+</table>
+
+<p class="nota">Document généré automatiquement — FlowForge ERP Automation Platform. Ce cahier des charges couvre les
+exigences, l'architecture et le planning ; il sera mis à jour à l'achèvement de chaque phase.</p>
+</body>
+</html>
